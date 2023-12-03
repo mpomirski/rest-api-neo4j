@@ -206,7 +206,7 @@ class AddEmployee(Resource):
             return tx.run(
                 '''
                 MATCH (d:Department {name: $department})
-                CREATE (employee:Employee {name: $name, surname: $surname, age: $age, position: $position})-[:WORKS_IN]->(d) RETURN employee
+                CREATE (employee:Employee {name: $name, surname: $surname, age: $age, position: $position})-[:WORKS_IN]->(d) RETURN employee, ID(employee) as id
                 ''',
                 {
                     'name': name,
@@ -219,8 +219,7 @@ class AddEmployee(Resource):
 
         results = db.write_transaction(
             create_employee, name, surname, age, position, department)
-        employee = results['employee']
-        return serialize_employee(employee), 201
+        return serialize_employee(results['employee'], results['id']), 201
 
 
 class EditEmployeeDepartment(Resource):
